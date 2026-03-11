@@ -1,635 +1,487 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>My-Note-Personality</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-<style>
-
-
-*{
-box-sizing:border-box;
-margin:0;
-padding:0;
-}
-
-body{
-font-family:Segoe UI,Arial;
-min-height:100vh;
-color:white;
-display:flex;
-flex-direction:column;
-overflow-x:hidden;
-
-/* FONDO DE COLORES */
-
-background:linear-gradient(
-135deg,
-#1a1a40,
-#2b2b70,
-#402060,
-#1e3c72
-);
-}
-
-/* ESTRELLAS Y CORAZONES */
-
-body::before{
-content:"";
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-
-background-image:
-radial-gradient(white 1px, transparent 1px),
-radial-gradient(#ffd6f9 1px, transparent 1px),
-radial-gradient(#ff9ecf 1px, transparent 1px);
-
-background-size:
-120px 120px,
-160px 160px,
-200px 200px;
-
-opacity:.35;
-pointer-events:none;
-}
-
-/* CORAZONES SUAVES */
-
-body::after{
-content:"♥  ♥  ♥  ♥";
-position:fixed;
-bottom:10px;
-right:20px;
-
-font-size:40px;
-letter-spacing:20px;
-
-color:#ff8bd6;
-
-opacity:.15;
-pointer-events:none;
-}
-/* ENCABEZADO */
-
-header{
-text-align:center;
-padding:50px 20px;
-}
-
-header h1{
-font-size:40px;
-letter-spacing:2px;
-
-/* TEXTO NEON */
-
-text-shadow:
-0 0 10px #00f2ff,
-0 0 20px #00f2ff,
-0 0 40px #00f2ff,
-0 0 60px #00f2ff;
-
-animation:glow 2s ease-in-out infinite alternate;
-}
-
-@keyframes glow{
-from{ text-shadow:0 0 10px #00f2ff; }
-to{ text-shadow:0 0 25px #00f2ff,0 0 60px #00f2ff; }
-}
-
-header p{
-opacity:.8;
-margin-top:10px;
-}
-
-/* TABLERO */
-
-.board{
-max-width:1200px;
-margin:auto;
-padding:20px;
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-gap:25px;
-}
-
-/* NOTAS */
-
-/* NOTAS MAS ELEGANTES */
-
-.note{
-position:relative;
-
-border-radius:20px;
-padding:20px;
-
-background:rgba(255,255,255,0.08);
-
-backdrop-filter:blur(14px);
--webkit-backdrop-filter:blur(14px);
-
-border:1px solid rgba(255,255,255,0.15);
-
-box-shadow:
-0 8px 25px rgba(0,0,0,0.35),
-0 0 15px rgba(0,255,255,0.15);
-
-display:flex;
-flex-direction:column;
-gap:12px;
-
-cursor:grab;
-
-transition:all .35s cubic-bezier(.2,.8,.2,1);
-
-animation:aparecer .7s ease;
-}
-
-/* LINEA SUPERIOR ELEGANTE */
-
-.note::before{
-
-content:"";
-
-position:absolute;
-top:0;
-left:0;
-
-width:100%;
-height:3px;
-
-border-radius:20px 20px 0 0;
-
-background:linear-gradient(
-90deg,
-#00f2ff,
-#ff00f7,
-#00ff9d
-);
-
-opacity:.8;
-}
-
-/* HOVER MAS SUAVE */
-
-.note:hover{
-
-transform:translateY(-10px) scale(1.04);
-
-box-shadow:
-0 15px 35px rgba(0,0,0,0.5),
-0 0 25px rgba(0,255,255,.4),
-0 0 40px rgba(255,0,255,.25);
-
-}
-
-/* TITULO MAS PREMIUM */
-
-.note-title{
-
-font-weight:600;
-font-size:17px;
-
-letter-spacing:.6px;
-
-padding-bottom:6px;
-
-border-bottom:1px solid rgba(255,255,255,0.15);
-
-}
-
-/* TEXTO MAS LIMPIO */
-
-.note textarea{
-
-width:100%;
-
-border:none;
-background:transparent;
-
-resize:none;
-
-font-size:14px;
-line-height:1.5;
-
-font-family:inherit;
-
-outline:none;
-
-min-height:90px;
-
-color:white;
-
-opacity:.9;
-
-}
-
-/* HERRAMIENTAS MAS SUAVES */
-
-.tools{
-
-display:flex;
-
-justify-content:space-between;
-
-align-items:center;
-
-font-size:14px;
-
-margin-top:6px;
-
-opacity:.85;
-
-}
-.colors{
-display:flex;
-gap:6px;
-}
-
-.color{
-width:20px;
-height:20px;
-border-radius:50%;
-border:none;
-cursor:pointer;
-transition:.2s;
-}
-
-.color:hover{
-transform:scale(1.3);
-box-shadow:0 0 10px white;
-}
-
-/* COLORES NOTA */
-
-.yellow{
-background:linear-gradient(135deg,#fff59d,#ffe082);
-color:#222;
-}
-
-.blue{
-background:linear-gradient(135deg,#64b5f6,#4fc3f7);
-color:#222;
-}
-
-.green{
-background:linear-gradient(135deg,#69f0ae,#00e676);
-color:#222;
-}
-
-.pink{
-background:linear-gradient(135deg,#f48fb1,#ff4081);
-color:#222;
-}
-
-.purple{
-background:linear-gradient(135deg,#ce93d8,#ab47bc);
-color:#222;
-}
-
-/* BOTONES */
-
-.c1{background:#ffe082;}
-.c2{background:#4fc3f7;}
-.c3{background:#00e676;}
-.c4{background:#ff4081;}
-.c5{background:#ab47bc;}
-
-/* FOOTER */
-
-footer{
-margin-top:auto;
-text-align:center;
-padding:30px;
-font-size:13px;
-opacity:.8;
-letter-spacing:1px;
-
-text-shadow:
-0 0 8px #00f2ff,
-0 0 20px #00f2ff;
-}
-
-
-/* TELEFONOS */
-
-@media (max-width:700px){
-
-.board{
-grid-template-columns:repeat(2,1fr);
-gap:15px;
-padding:15px;
-}
-
-.note{
-padding:15px;
-font-size:13px;
-}
-
-}
-</style>
-
+    <meta charset="UTF-8">
+    <title>My-Note-Personality | IBEDH</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --accent: #00f2ff;
+            --pink: #ff8bd6;
+            --glass: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background: radial-gradient(circle at top, #2b2b70, #1a1a40, #0a0a1a);
+            background-attachment: fixed;
+        }
+
+        /* FONDO DINÁMICO DE ESTRELLAS */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(1.5px 1.5px at 20px 30px, #fff, transparent),
+                radial-gradient(2px 2px at 150px 150px, #ffd6f9, transparent),
+                radial-gradient(1.5px 1.5px at 280px 70px, #fff, transparent);
+            background-size: 300px 300px;
+            animation: twinkle 4s ease-in-out infinite alternate;
+            opacity: 0.4;
+            z-index: -1;
+        }
+
+        @keyframes twinkle {
+            from { opacity: 0.3; transform: translateY(0); }
+            to { opacity: 0.6; transform: translateY(-20px); }
+        }
+
+        /* CORAZONES FLOTANTES EN LAS ESQUINAS */
+        body::after {
+            content: "♥";
+            position: fixed;
+            bottom: 30px;
+            right: 40px;
+            font-size: 50px;
+            color: var(--pink);
+            opacity: 0.2;
+            filter: blur(1px);
+            animation: floatHeart 5s infinite ease-in-out;
+            pointer-events: none;
+        }
+
+        @keyframes floatHeart {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.1); opacity: 0.4; }
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        header h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            background: linear-gradient(to right, var(--accent), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px rgba(0, 242, 255, 0.4));
+            margin-bottom: 15px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        header p {
+            opacity: 0.7;
+            font-weight: 300;
+            letter-spacing: 1px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* TABLERO */
+        .board {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        /* NOTAS GLASSMORPHISM */
+        .note {
+            position: relative;
+            border-radius: 24px;
+            padding: 25px;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: scaleIn 0.6s ease-out forwards;
+            opacity: 0; /* Para la animación de entrada */
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .note:hover {
+            transform: translateY(-10px) rotate(1deg);
+            border-color: var(--accent);
+            box-shadow: 0 20px 45px rgba(0, 242, 255, 0.15);
+        }
+
+        .note-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--accent);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+        }
+
+        .note textarea {
+            width: 100%;
+            border: none;
+            background: transparent;
+            resize: none;
+            font-family: inherit;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #f0f0f0;
+            outline: none;
+            min-height: 100px;
+        }
+
+        .tools {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            font-size: 1.2rem;
+        }
+
+        .colors {
+            display: flex;
+            gap: 8px;
+        }
+
+        .color {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.2);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .color:hover { transform: scale(1.4); border-color: white; }
+
+        /* ESTILOS DE COLORES CON GRADIENTES */
+        .yellow { background: linear-gradient(135deg, rgba(255,245,157,0.25), rgba(255,224,130,0.25)); }
+        .blue   { background: linear-gradient(135deg, rgba(100,181,246,0.25), rgba(79,195,247,0.25)); }
+        .green  { background: linear-gradient(135deg, rgba(105,240,174,0.25), rgba(0,230,118,0.25)); }
+        .pink   { background: linear-gradient(135deg, rgba(244,143,177,0.25), rgba(255,64,129,0.25)); }
+        .purple { background: linear-gradient(135deg, rgba(206,147,216,0.25), rgba(171,71,188,0.25)); }
+
+        /* Ajuste de brillo para notas con color */
+        .note:not([class="note"]) {
+            border: 1px solid rgba(255,255,255,0.4);
+        }
+
+        /* BOTONES DE COLORES */
+        .c1{background:#ffe082;} .c2{background:#4fc3f7;} .c3{background:#00e676;} 
+        .c4{background:#ff4081;} .c5{background:#ab47bc;}
+
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 40px;
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.3rem;
+            color: var(--pink);
+            text-shadow: 0 0 10px rgba(255, 139, 214, 0.3);
+            letter-spacing: 1px;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width:700px){
+            .board { grid-template-columns: 1fr; padding: 15px; }
+            header h1 { font-size: 2.8rem; }
+        }
+    </style>
 </head>
 
 <body>
 
 <header>
-<h1>Cosas que no debo olvidar de IBEDH</h1>
-<p>El contenido y las funciones continuarán expandiéndose en próximas versiones.</p>
+    <h1>Cosas que no debo olvidar de IBEDH</h1>
+    <p>Un pequeño espacio dedicado a los detalles que te hacen especial.</p>
 </header>
 
 <div class="board" id="board">
+    <div class="note" draggable="true" style="animation-delay: 0.1s">
+        <div class="note-title">Tus Colores Favoritos:</div>
+        <textarea readonly>Negro y Blanco</textarea>
+        <div class="tools">
+            <span>📌</span>
+            <div class="colors">
+                <button class="color c1" onclick="changeColor(this,'yellow')"></button>
+                <button class="color c2" onclick="changeColor(this,'blue')"></button>
+                <button class="color c3" onclick="changeColor(this,'green')"></button>
+                <button class="color c4" onclick="changeColor(this,'pink')"></button>
+                <button class="color c5" onclick="changeColor(this,'purple')"></button>
+            </div>
+        </div>
+    </div>
 
-<div class="note" draggable="true">
+    <div class="note" draggable="true" style="animation-delay: 0.2s">
+        <div class="note-title">Canción Favorita:</div>
+        <textarea readonly>All The Stars</textarea>
+        <div class="tools"><span>✨</span><div class="colors">
+            <button class="color c1" onclick="changeColor(this,'yellow')"></button>
+            <button class="color c2" onclick="changeColor(this,'blue')"></button>
+            <button class="color c3" onclick="changeColor(this,'green')"></button>
+            <button class="color c4" onclick="changeColor(this,'pink')"></button>
+            <button class="color c5" onclick="changeColor(this,'purple')"></button>
+        </div></div>
+    </div>
 
-<div class="note-title">Tus Colores Favoritos:</div>
+    <div class="note" draggable="true" style="animation-delay: 0.3s">
+        <div class="note-title">Le Gusta:</div>
+        <textarea readonly>Las uvas verdes</textarea>
+        <div class="tools"><span>🍇</span><div class="colors">
+            <button class="color c1" onclick="changeColor(this,'yellow')"></button>
+            <button class="color c2" onclick="changeColor(this,'blue')"></button>
+            <button class="color c3" onclick="changeColor(this,'green')"></button>
+            <button class="color c4" onclick="changeColor(this,'pink')"></button>
+            <button class="color c5" onclick="color(this,'purple')"></button>
+        </div></div>
+    </div>
 
-<textarea readonly>Negro y Blanco</textarea>
+    <div class="note" draggable="true" style="animation-delay: 0.4s">
+        <div class="note-title">Tiene:</div>
+        <textarea readonly>Unos Ojos y Pestañas hermosas</textarea>
+        <div class="tools"><span>👁️</span><div class="colors">
+            <button class="color c1" onclick="changeColor(this,'yellow')"></button>
+            <button class="color c2" onclick="changeColor(this,'blue')"></button>
+            <button class="color c3" onclick="changeColor(this,'green')"></button>
+            <button class="color c4" onclick="changeColor(this,'pink')"></button>
+            <button class="color c5" onclick="changeColor(this,'purple')"></button>
+        </div></div>
+    </div>
 
-<div class="tools">
-<span>📌</span>
-<div class="colors">
-<button class="color c1" onclick="color(this,'yellow')"></button>
-<button class="color c2" onclick="color(this,'blue')"></button>
-<button class="color c3" onclick="color(this,'green')"></button>
-<button class="color c4" onclick="color(this,'pink')"></button>
-<button class="color c5" onclick="color(this,'purple')"></button>
-</div>
-</div>
+    <div class="note" draggable="true" style="animation-delay: 0.5s">
+        <div class="note-title">Prefiere:</div>
+        <textarea readonly>El chocolate semi-amargo</textarea>
+        <div class="tools"><span>🍫</span><div class="colors">
+            <button class="color c1" onclick="changeColor(this,'yellow')"></button>
+            <button class="color c2" onclick="changeColor(this,'blue')"></button>
+            <button class="color c3" onclick="changeColor(this,'green')"></button>
+            <button class="color c4" onclick="changeColor(this,'pink')"></button>
+            <button class="color c5" onclick="changeColor(this,'purple')"></button>
+        </div></div>
+    </div>
 
-</div>
+    <div class="note" draggable="true" style="animation-delay: 0.6s">
+        <div class="note-title">Su Comida Favorita:</div>
+        <textarea readonly>Pollo a la plancha con verduras</textarea>
+        <div class="tools"><span>🥗</span><div class="colors">
+            <button class="color c1" onclick="changeColor(this,'yellow')"></button>
+            <button class="color c2" onclick="changeColor(this,'blue')"></button>
+            <button class="color c3" onclick="changeColor(this,'green')"></button>
+            <button class="color c4" onclick="changeColor(this,'pink')"></button>
+            <button class="color c5" onclick="changeColor(this,'purple')"></button>
+        </div></div>
+    </div>
 
+    <div class="note" draggable="true" style="animation-delay: 0.7s">
+        <div class="note-title">Su Nombre Favorito:</div>
+        <textarea readonly>Ibedh</textarea>
+        <div class="tools"><span>💎</span><div class="colors">
+            <button class="color c1" onclick="changeColor(this,'yellow')"></button>
+            <button class="color c2" onclick="changeColor(this,'blue')"></button>
+            <button class="color c3" onclick="changeColor(this,'green')"></button>
+            <button class="color c4" onclick="changeColor(this,'pink')"></button>
+            <button class="color c5" onclick="changeColor(this,'purple')"></button>
+        </div></div>
+    </div>
 
-<div class="note" draggable="true">
+    <div class="note" draggable="true" style="animation-delay: 0.8s">
+        <div class="note-title">Es y Será:</div>
+        <textarea readonly>Una excelente estudiante y una futura gran Doctora 🩺</textarea>
+        <div class="tools"><span>🎓</span><div class="colors">
+            <button class="color c1" onclick="changeColor(this,'yellow')"></button>
+            <button class="color c2" onclick="changeColor(this,'blue')"></button>
+            <button class="color c3" onclick="changeColor(this,'green')"></button>
+            <button class="color c4" onclick="changeColor(this,'pink')"></button>
+            <button class="color c5" onclick="changeColor(this,'purple')"></button>
+        </div></div>
+    </div>
 
-<div class="note-title">Cancion Favorita Actualmente:</div>
+    <div class="note" draggable="true" style="animation-delay: 0.9s">
+        <div class="note-title">Tenemos Pendiente:</div>
+        <textarea readonly>Un picnic y visitar el Pueblito de Mazamitla 🌲</textarea>
+        <div class="tools"><span>🧺</span><div class="colors">
+            <button class="color c1" onclick="changeColor(this,'yellow')"></button>
+            <button class="color c2" onclick="changeColor(this,'blue')"></button>
+            <button class="color c3" onclick="changeColor(this,'green')"></button>
+            <button class="color c4" onclick="changeColor(this,'pink')"></button>
+            <button class="color c5" onclick="changeColor(this,'purple')"></button>
+        </div></div>
+    </div>
 
-<textarea readonly>All The Stars</textarea>
-
-<div class="tools">
-<span>📌</span>
-<div class="colors">
-<button class="color c1" onclick="color(this,'yellow')"></button>
-<button class="color c2" onclick="color(this,'blue')"></button>
-<button class="color c3" onclick="color(this,'green')"></button>
-<button class="color c4" onclick="color(this,'pink')"></button>
-<button class="color c5" onclick="color(this,'purple')"></button>
-</div>
-</div>
-
-</div>
-
-
-<div class="note" draggable="true">
-
-<div class="note-title">Le Gusta:</div>
-<textarea readonly>Las uvas verdes</textarea>
-
-<div class="tools">
-<span>📌</span>
-<div class="colors">
-<button class="color c1" onclick="color(this,'yellow')"></button>
-<button class="color c2" onclick="color(this,'blue')"></button>
-<button class="color c3" onclick="color(this,'green')"></button>
-<button class="color c4" onclick="color(this,'pink')"></button>
-<button class="color c5" onclick="color(this,'purple')"></button>
-</div>
-</div>
-
-</div>
-
-
-<div class="note" draggable="true">
-
-<div class="note-title">Tiene:</div>
-
-<textarea readonly>Unos Ojos y Pestañas hermosas</textarea>
-
-<div class="tools">
-<span>📌</span>
-<div class="colors">
-<button class="color c1" onclick="color(this,'yellow')"></button>
-<button class="color c2" onclick="color(this,'blue')"></button>
-<button class="color c3" onclick="color(this,'green')"></button>
-<button class="color c4" onclick="color(this,'pink')"></button>
-<button class="color c5" onclick="color(this,'purple')"></button>
-</div>
-</div>
-
-</div>
-
-<div class="note" draggable="true">
-
-<div class="note-title">Prefiere:</div>
-
-<textarea readonly>El chocolate semi-amargo</textarea>
-
-<div class="tools">
-<span>📌</span>
-<div class="colors">
-<button class="color c1" onclick="color(this,'yellow')"></button>
-<button class="color c2" onclick="color(this,'blue')"></button>
-<button class="color c3" onclick="color(this,'green')"></button>
-<button class="color c4" onclick="color(this,'pink')"></button>
-<button class="color c5" onclick="color(this,'purple')"></button>
-</div>
-</div>
-
-</div>
-
-<div class="note" draggable="true">
-
-<div class="note-title">Su Comida Favorita:</div>
-
-<textarea readonly>Pollo a la pancha con verduras </textarea>
-
-<div class="tools">
-<span>📌</span>
-<div class="colors">
-<button class="color c1" onclick="color(this,'yellow')"></button>
-<button class="color c2" onclick="color(this,'blue')"></button>
-<button class="color c3" onclick="color(this,'green')"></button>
-<button class="color c4" onclick="color(this,'pink')"></button>
-<button class="color c5" onclick="color(this,'purple')"></button>
-</div>
-</div>
-
-</div>
-
-<div class="note" draggable="true">
-
-<div class="note-title">Su Nombre Favorito:</div>
-
-<textarea readonly>Ibedh</textarea>
-
-<div class="tools">
-<span>📌</span>
-<div class="colors">
-<button class="color c1" onclick="color(this,'yellow')"></button>
-<button class="color c2" onclick="color(this,'blue')"></button>
-<button class="color c3" onclick="color(this,'green')"></button>
-<button class="color c4" onclick="color(this,'pink')"></button>
-<button class="color c5" onclick="color(this,'purple')"></button>
-</div>
+    <div class="note" draggable="true" style="animation-delay: 1.1s">
+    <div class="note-title">Un día para celebrar el 27 de febrero:</div>
+    <textarea readonly>Por su cumpleaños (¡El día más importante del calendario! 🎂)</textarea>
+    <div class="tools"><span>🎈</span><div class="colors">
+        <button class="color c1" onclick="changeColor(this,'yellow')"></button>
+        <button class="color c2" onclick="changeColor(this,'blue')"></button>
+        <button class="color c3" onclick="changeColor(this,'green')"></button>
+        <button class="color c4" onclick="changeColor(this,'pink')"></button>
+        <button class="color c5" onclick="changeColor(this,'purple')"></button>
+    </div></div>
 </div>
 
+<div class="note" draggable="true" style="animation-delay: 1.2s">
+    <div class="note-title">Lo que más admiro:</div>
+    <textarea readonly>Su increíble determinación y la forma en que cuida de los demás 💖</textarea>
+    <div class="tools"><span>🌟</span><div class="colors">
+        <button class="color c1" onclick="changeColor(this,'yellow')"></button>
+        <button class="color c2" onclick="changeColor(this,'blue')"></button>
+        <button class="color c3" onclick="changeColor(this,'green')"></button>
+        <button class="color c4" onclick="changeColor(this,'pink')"></button>
+        <button class="color c5" onclick="changeColor(this,'purple')"></button>
+    </div></div>
 </div>
 
-<div class="note" draggable="true">
-
-<div class="note-title">Es y Sera:</div>
-
-<textarea readonly>Es: Una excelente estudiante, y Sera: Una excelente Doctora</textarea>
-
-<div class="tools">
-<span>📌</span>
-<div class="colors">
-<button class="color c1" onclick="color(this,'yellow')"></button>
-<button class="color c2" onclick="color(this,'blue')"></button>
-<button class="color c3" onclick="color(this,'green')"></button>
-<button class="color c4" onclick="color(this,'pink')"></button>
-<button class="color c5" onclick="color(this,'purple')"></button>
-</div>
+<div class="note" draggable="true" style="animation-delay: 1.3s">
+    <div class="note-title">Clima ideal:</div>
+    <textarea readonly>Prefiere el frío ❄️</textarea>
+    <div class="tools"><span>☃️</span><div class="colors">
+        <button class="color c1" onclick="changeColor(this,'yellow')"></button>
+        <button class="color c2" onclick="changeColor(this,'blue')"></button>
+        <button class="color c3" onclick="changeColor(this,'green')"></button>
+        <button class="color c4" onclick="changeColor(this,'pink')"></button>
+        <button class="color c5" onclick="changeColor(this,'purple')"></button>
+    </div></div>
 </div>
 
+<div class="note" draggable="true" style="animation-delay: 1.4s">
+    <div class="note-title">En sus ratos libres:</div>
+    <textarea readonly>Le encanta pintar entre colores, dejar que la música la acompañe siempre y, sobre todo, y le encanta dormir 🎨🎧😴</textarea>
+    <div class="tools"><span>🍿</span><div class="colors">
+        <button class="color c1" onclick="changeColor(this,'yellow')"></button>
+        <button class="color c2" onclick="changeColor(this,'blue')"></button>
+        <button class="color c3" onclick="changeColor(this,'green')"></button>
+        <button class="color c4" onclick="changeColor(this,'pink')"></button>
+        <button class="color c5" onclick="changeColor(this,'purple')"></button>
+    </div></div>
 </div>
 
-<div class="note" draggable="true">
-
-<div class="note-title">Tenemos Pendiente:</div>
-
-<textarea readonly>Un picni, y ir al Pueblito de Mazamitla</textarea>
-
-<div class="tools">
-<span>📌</span>
-<div class="colors">
-<button class="color c1" onclick="color(this,'yellow')"></button>
-<button class="color c2" onclick="color(this,'blue')"></button>
-<button class="color c3" onclick="color(this,'green')"></button>
-<button class="color c4" onclick="color(this,'pink')"></button>
-<button class="color c5" onclick="color(this,'purple')"></button>
-</div>
+<div class="note" draggable="true" style="animation-delay: 1.5s">
+    <div class="note-title">Recordatorio diario:</div>
+    <textarea readonly>Eres más capaz de lo que crees y mucho más valiosa de lo que imaginas ✨</textarea>
+    <div class="tools"><span>💪</span><div class="colors">
+        <button class="color c1" onclick="changeColor(this,'yellow')"></button>
+        <button class="color c2" onclick="changeColor(this,'blue')"></button>
+        <button class="color c3" onclick="changeColor(this,'green')"></button>
+        <button class="color c4" onclick="changeColor(this,'pink')"></button>
+        <button class="color c5" onclick="changeColor(this,'purple')"></button>
+    </div></div>
 </div>
 
+<div class="note" draggable="true" style="animation-delay: 1.7s">
+    <div class="note-title">Su voz:</div>
+    <textarea readonly>Es la melodía que me da paz; podría escucharla por horas sin cansarme nunca 🎶</textarea>
+    <div class="tools"><span>🎧</span><div class="colors">
+        <button class="color c1" onclick="changeColor(this,'yellow')"></button>
+        <button class="color c2" onclick="changeColor(this,'blue')"></button>
+        <button class="color c3" onclick="changeColor(this,'green')"></button>
+        <button class="color c4" onclick="changeColor(this,'pink')"></button>
+        <button class="color c5" onclick="changeColor(this,'purple')"></button>
+    </div></div>
 </div>
 
-<div class="note" draggable="true">
-
-<div class="note-title">La Palabra Que Mas Me A Dicho Es:</div>
-
-<textarea readonly>Lo siento y Perdon</textarea>
-
-<div class="tools">
-<span>📌</span>
-<div class="colors">
-<button class="color c1" onclick="color(this,'yellow')"></button>
-<button class="color c2" onclick="color(this,'blue')"></button>
-<button class="color c3" onclick="color(this,'green')"></button>
-<button class="color c4" onclick="color(this,'pink')"></button>
-<button class="color c5" onclick="color(this,'purple')"></button>
-</div>
-</div>
-
-</div>
-
-
-
+    <div class="note" draggable="true" style="animation-delay: 1s">
+        <div class="note-title"> La palabras mas recurrentes:</div>
+        <textarea readonly>"Lo siento" y "Perdón" (¡No hay nada que perdonar!)</textarea>
+        <div class="tools"><span>❤️</span><div class="colors">
+            <button class="color c1" onclick="changeColor(this,'yellow')"></button>
+            <button class="color c2" onclick="changeColor(this,'blue')"></button>
+            <button class="color c3" onclick="changeColor(this,'green')"></button>
+            <button class="color c4" onclick="changeColor(this,'pink')"></button>
+            <button class="color c5" onclick="changeColor(this,'purple')"></button>
+        </div></div>
+    </div>
 </div>
 
 <footer>
-Se actualizará cada que algo no deba ser olvidado
+    Actualizado con amor cada vez que aprendo algo nuevo de ti.
 </footer>
 
 <script>
-/* COLORES ALEATORIOS */
+    /* CAMBIAR COLOR Y GUARDAR */
+    function changeColor(btn, colorClass) {
+        const note = btn.closest(".note");
+        // Limpiar clases anteriores pero mantener 'note'
+        note.className = "note " + colorClass;
+        saveAllData();
+    }
 
-const coloresNotas = ["yellow","blue","green","pink","purple"];
+    function saveAllData() {
+        const notes = document.querySelectorAll(".note");
+        notes.forEach((n, i) => {
+            localStorage.setItem("color_v2_" + i, n.className);
+        });
+    }
 
-document.querySelectorAll(".note").forEach((nota,i)=>{
+    /* CARGAR DATOS AL INICIAR */
+    window.onload = () => {
+        document.querySelectorAll(".note").forEach((n, i) => {
+            const savedColor = localStorage.getItem("color_v2_" + i);
+            if (savedColor) {
+                n.className = savedColor;
+            }
+        });
+    }
 
-let guardado = localStorage.getItem("color"+i);
+    /* SISTEMA DRAG & DROP MEJORADO */
+    let dragItem = null;
 
-if(guardado){
+    document.querySelectorAll(".note").forEach(n => {
+        n.addEventListener("dragstart", () => {
+            dragItem = n;
+            setTimeout(() => n.style.opacity = "0.5", 0);
+        });
 
-nota.className = guardado;
+        n.addEventListener("dragend", () => {
+            dragItem.style.opacity = "1";
+            dragItem = null;
+        });
 
-}else{
+        n.addEventListener("dragover", e => e.preventDefault());
 
-let randomColor = coloresNotas[Math.floor(Math.random()*coloresNotas.length)];
+        n.addEventListener("drop", function() {
+            if (dragItem !== this) {
+                let allNotes = Array.from(document.querySelectorAll(".note"));
+                let dragIdx = allNotes.indexOf(dragItem);
+                let dropIdx = allNotes.indexOf(this);
 
-nota.classList.add(randomColor);
-
-}
-
-});
-
-/* GUARDAR TEXTO */
-
-document.querySelectorAll(".note textarea").forEach((t,i)=>{
-
-t.value = localStorage.getItem("nota"+i) || t.value
-
-t.addEventListener("input",()=>{
-localStorage.setItem("nota"+i,t.value)
-})
-
-})
-
-/* CAMBIAR COLOR */
-
-function color(btn,c){
-
-const note = btn.closest(".note")
-
-note.className = "note "+c
-
-saveColors()
-
-}
-
-function saveColors(){
-
-document.querySelectorAll(".note").forEach((n,i)=>{
-localStorage.setItem("color"+i,n.className)
-})
-
-}
-
-document.querySelectorAll(".note").forEach((n,i)=>{
-
-const c = localStorage.getItem("color"+i)
-
-if(c) n.className = c
-
-})
-
-/* DRAG */
-
-let drag
-
-document.querySelectorAll(".note").forEach(n=>{
-
-n.addEventListener("dragstart",()=>{
-drag=n
-})
-
-n.addEventListener("dragover",e=>{
-e.preventDefault()
-})
-
-n.addEventListener("drop",()=>{
-if(drag!=n){
-document.getElementById("board").insertBefore(drag,n)
-}
-})
-
-})
-
+                if (dragIdx < dropIdx) {
+                    this.after(dragItem);
+                } else {
+                    this.before(dragItem);
+                }
+            }
+        });
+    });
 </script>
 
 </body>
